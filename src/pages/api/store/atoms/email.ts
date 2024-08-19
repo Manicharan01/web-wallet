@@ -1,12 +1,6 @@
 import { atom } from "recoil";
 
-export type Email = {
-  email: string;
-};
-
-export const emailState = atom<Email>({
+export const emailState = atom<string>({
   key: "emailState",
-  default: {
-    email: "",
-  },
+  default: "",
 });
