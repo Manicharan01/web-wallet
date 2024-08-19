@@ -1,6 +1,6 @@
 import { atom } from "recoil";
 
-export const seedState = atom<string>({
+export const seedState = atom({
   key: "seedState",
-  default: "",
+  default: [],
 });
