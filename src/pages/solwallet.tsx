@@ -10,7 +10,7 @@ import { Button, Typography } from '@mui/material';
 export const SolWallet = () => {
     const mnemonic = useRecoilValue(mnemonicSelector) as string;
     const [currentIndex, setCurrentIndex] = useState(0);
-    const [addresses, setAddresses] = useState([]);
+    const [addresses, setAddresses] = useState(['']);
 
     return (
         <div>

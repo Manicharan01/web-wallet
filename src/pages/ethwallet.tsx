@@ -8,7 +8,7 @@ import { mnemonicToSeedSync } from 'bip39';
 export const EthWallet = () => {
     const mnemonic = useRecoilValue(mnemonicSelector) as string;
     const [currentIndex, setCurrentIndex] = useState(0);
-    const [addresses, setAddresses] = useState([]);
+    const [addresses, setAddresses] = useState([{ address: '', balance: '' }]);
 
     return (
         <div>
@@ -21,11 +21,23 @@ export const EthWallet = () => {
                 const privateKey = childNode.privateKey;
                 const wallet = new Wallet(privateKey);
                 setCurrentIndex(currentIndex + 1);
-                setAddresses([...addresses, wallet.address]);
+
+                await fetch('https://eth-mainnet.g.alchemy.com/v2/9exH_3EB8W4xlH_SWQirrfjqCOtB17Dj', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        jsonrpc: '2.0',
+                        id: 1,
+                        method: 'eth_getBalance',
+                        params: [wallet.address, 'latest'],
+                    }),
+                }).then((res) => res.json()).then((data) => {
+                    console.log(data.result);
+                    setAddresses([...addresses, { address: wallet.address, balance: String(Number(data.result)) }]);
+                });
             }}>Generate ETH Wallet</Button>
 
-            {addresses.map((a, i) => (<div>
-                <Typography key={i}>{a}</Typography>
+            {addresses.map((user) => (<div>
+                <Typography>{user.address} {user.balance}</Typography>
             </div>
             ))}
         </div>
