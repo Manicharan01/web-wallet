@@ -10,7 +10,7 @@ import { Button, Typography } from '@mui/material';
 export const SolWallet = () => {
     const mnemonic = useRecoilValue(mnemonicSelector) as string;
     const [currentIndex, setCurrentIndex] = useState(0);
-    const [addresses, setAddresses] = useState(['']);
+    const [addresses, setAddresses] = useState([{ address: '', balance: '' }]);
 
     return (
         <div>
@@ -22,13 +22,33 @@ export const SolWallet = () => {
                 const secret = nacl.sign.keyPair.fromSeed(derivedSeed).secretKey;
                 const keypair = Keypair.fromSecretKey(secret);
                 setCurrentIndex(currentIndex + 1);
-                setAddresses([...addresses, keypair.publicKey.toBase58()]);
+
+                await fetch('https://solana-mainnet.g.alchemy.com/v2/9exH_3EB8W4xlH_SWQirrfjqCOtB17Dj', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        jsonrpc: '2.0',
+                        id: 1,
+                        method: 'getBalance',
+                        params: [keypair.publicKey.toBase58()],
+                    }),
+                })
+                    .then((res) => res.json())
+                    .then((data) => {
+                        console.log(data.result.value)
+                        setAddresses([...addresses, { address: keypair.publicKey.toBase58(), balance: String(Number(data.result.value)) }]);
+
+                    });
             }}>Generate SOL Wallet</Button>
 
-            {addresses.map((a, i) => (<div>
-                <Typography key={i}>{a}</Typography>
-            </div>
-            ))}
-        </div>
+            {
+                addresses.map((address) => (<div>
+                    <Typography>{address.address} {address.balance}</Typography>
+                </div>
+                ))
+            }
+        </div >
     );
 };
